@@ -131,9 +131,7 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-.env.*
+
 
 # Mac system files
 .DS_Store
