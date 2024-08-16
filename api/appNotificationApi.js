@@ -1,15 +1,20 @@
-import express from "express";
-const AppRouter = express.Router();
+// api/appNotificationApi.js
 
-AppRouter.post('/send-notification', (req, res) => {
-    const title = 'New Booking';
-    const body = 'Saad has booked a Cab';
-  
-    // Log the notification data to the console
-    console.log(`Title: ${title}`);
-    console.log(`Body: ${body}`);
-  
-    res.status(200).json({ message: 'Notification sent!' });
-  });
+import express from 'express';
+import { notifyApp } from '../app.js'; // Adjust the path if needed
 
-  export default AppRouter;
+const CabBookingNotificationRouter = express.Router();
+
+// Assuming you have a POST route where the booking is created
+CabBookingNotificationRouter.post('/notify', async (req, res) => {
+  const bookingDetails = req.body;
+
+  try {
+    notifyApp(bookingDetails); // Send notification to WebSocket client (Flutter app)
+    res.status(200).json({ message: 'Notification sent to client' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send notification', details: err.message });
+  }
+});
+
+export default CabBookingNotificationRouter;
