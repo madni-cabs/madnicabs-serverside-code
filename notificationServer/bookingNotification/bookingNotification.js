@@ -1,9 +1,7 @@
-// notificationServer.js
-
 import { WebSocketServer } from 'ws';
 
-// Create a WebSocket server
-const wss = new WebSocketServer({ port: 7777 }); // Change the port if needed
+// Create a WebSocket server on port 6666
+const wss = new WebSocketServer({ port: 6666 });
 
 let clients = [];
 
@@ -25,4 +23,4 @@ export const notifyClients = (bookingDetails) => {
   });
 };
 
-console.log('WebSocket server running on port 7777');
+console.log('WebSocket server running on port 6666');

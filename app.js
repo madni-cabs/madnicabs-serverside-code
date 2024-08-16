@@ -14,7 +14,7 @@ import tagsRoutes from './api/tagsApi.js';
 import rentrouter from './api/rentApi.js';
 import imagesRouter from './api/imagesApi.js';
 import CabBookingNotificationRouter from './api/appNotificationApi.js';
-import http from 'http'; // Using HTTP instead of HTTPS
+import http from 'http';
 import { WebSocketServer } from 'ws';
 
 const app = express();
@@ -39,29 +39,34 @@ app.use('/api/rent', rentrouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/app', CabBookingNotificationRouter);
 
-// Create an HTTP server and attach the WebSocket server to it
-const server = http.createServer(app); // Use HTTP here
-const wss = new WebSocketServer({ server });
+// Create an HTTP server
+const server = http.createServer(app);
 
-let appClient = null;
+// Set up WebSocket server on a different port
+const wssPort = 6666;
+const wss = new WebSocketServer({ port: wssPort });
 
 wss.on('connection', (ws) => {
   console.log('App connected for notifications');
-  appClient = ws;
+  
+  ws.on('message', (message) => {
+    console.log(`Received message: ${message}`);
+  });
 
   ws.on('close', () => {
     console.log('App disconnected from notifications');
-    appClient = null;
   });
 });
 
 export const notifyApp = (bookingDetails) => {
-  if (appClient && appClient.readyState === WebSocket.OPEN) {
-    appClient.send(JSON.stringify(bookingDetails));
-  }
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(bookingDetails));
+    }
+  });
 };
 
-// Start the server
+// Start the HTTP server
 const startServer = async () => {
   try {
     await dbConnect;
@@ -73,8 +78,10 @@ const startServer = async () => {
     const port = process.env.PORT || 80; // Default HTTP port
 
     server.listen(port, () => {
-      console.log(`Server and WebSocket running at http://localhost:${port}`);
+      console.log(`HTTP Server running at http://localhost:${port}`);
     });
+
+    console.log(`WebSocket server running on port ${wssPort}`);
   } catch (err) {
     console.error('Error starting server:', err);
   }
