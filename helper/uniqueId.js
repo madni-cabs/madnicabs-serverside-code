@@ -1,5 +1,5 @@
 export default function uniqueId () {
-    const prefix = 'madnitravels';
+    const prefix = 'madnicabs';
     const length = 30;
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';

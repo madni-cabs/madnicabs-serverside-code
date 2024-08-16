@@ -6,57 +6,58 @@ const cabBookRouter = express.Router();
 // Generate a unique 4-digit ID based on the current timestamp
 const generateId = () => {
   const timestamp = Date.now().toString();
-  return timestamp.slice(-6); // Get the last 4 digits
+  return timestamp.slice(-6); // Get the last 6 digits
 };
 
 // POST - Create a new cab booking
+// POST - Create a new cab booking
 cabBookRouter.post('/add', async (req, res) => {
   const {
-    pickup_location,
-    drop_location,
-    pickup_date,
-    pickup_time,
-    full_name,
-    email,
-    phone_number,
-    country,
-    distance,
-    rent,
-    message,
-    status = 'Pending'
+      pickup_location,
+      drop_location,
+      cabname,
+      pickup_date,
+      pickup_time,
+      full_name,
+      email,
+      phone_number,
+      country,
+      rent,
+      message,
+      status = 'Pending'
   } = req.body;
   const id = generateId();
 
   try {
-    await dbConnect;
-    const request = new sql.Request();
-    const query = `
-      INSERT INTO cabbooklist (id,pickup_location, drop_location, pickup_date, pickup_time, full_name, email, phone_number, country, distance, rent, message, status)
-      VALUES (@id,@pickup_location, @drop_location, @pickup_date, @pickup_time, @full_name, @Email, @phone_number, @country, @distance, @rent, @message, @status)
-    `;
-    request.input('id', sql.NVarChar, id);
-    request.input('pickup_location', sql.NVarChar, pickup_location);
-    request.input('drop_location', sql.NVarChar, drop_location);
-    request.input('pickup_date', sql.NVarChar, pickup_date);
-    request.input('pickup_time', sql.NVarChar, pickup_time);
-    request.input('full_name', sql.NVarChar, full_name);
-    request.input('email', sql.NVarChar, email);
-    request.input('phone_number', sql.NVarChar, phone_number);
-    request.input('country', sql.NVarChar, country);
-    request.input('distance', sql.Float, distance);
-    request.input('rent', sql.Int, rent);
-    request.input('message', sql.NVarChar, message);
-    request.input('status', sql.NVarChar, status);
+      await dbConnect;
+      const request = new sql.Request();
+      const query = `
+          INSERT INTO cabbooklist (id, pickup_location, drop_location, cabname, pickup_date, pickup_time, full_name, email, phone_number, country, rent, message, status)
+          VALUES (@id, @pickup_location, @drop_location, @cabname, @pickup_date, @pickup_time, @full_name, @Email, @phone_number, @country, @rent, @message, @status)
+      `;
+      request.input('id', sql.NVarChar, id);
+      request.input('pickup_location', sql.NVarChar, pickup_location);
+      request.input('drop_location', sql.NVarChar, drop_location);
+      request.input('cabname', sql.NVarChar, cabname);
+      request.input('pickup_date', sql.NVarChar, pickup_date);
+      request.input('pickup_time', sql.NVarChar, pickup_time);
+      request.input('full_name', sql.NVarChar, full_name);
+      request.input('email', sql.NVarChar, email);
+      request.input('phone_number', sql.NVarChar, phone_number);
+      request.input('country', sql.NVarChar, country);
+      request.input('rent', sql.Int, rent);
+      request.input('message', sql.NVarChar, message);
+      request.input('status', sql.NVarChar, status);
 
-    await request.query(query);
-    // Send the notification after successful booking
-    notifyApp({ title: 'New Booking', body: `${full_name} has booked a cab.` });
+      await request.query(query);
 
-    res.status(201).json({ message: 'Booking created successfully' });
+      // Return the generated booking ID
+      res.status(201).json({ message: 'Booking created successfully', id });
   } catch (err) {
-    res.status(500).json({ error: 'Error creating booking', details: err.message });
+      res.status(500).json({ error: 'Error creating booking', details: err.message });
   }
 });
+
 
 // GET - Get all cab bookings
 cabBookRouter.get('/get', async (req, res) => {
@@ -80,7 +81,7 @@ cabBookRouter.get('/get/:id', async (req, res) => {
   try {
     await dbConnect;
     const request = new sql.Request();
-    request.input('id', sql.Int, id);
+    request.input('id', sql.NVarChar, id);
     const query = 'SELECT * FROM cabbooklist WHERE id = @id';
 
     const result = await request.query(query);
@@ -101,13 +102,13 @@ cabBookRouter.put('/update/:id', async (req, res) => {
   const {
     pickup_location,
     drop_location,
+    cabname,
     pickup_date,
     pickup_time,
     full_name,
     email,
     phone_number,
     country,
-    distance,
     rent,
     message,
     status
@@ -119,13 +120,13 @@ cabBookRouter.put('/update/:id', async (req, res) => {
     request.input('id', sql.NVarChar, id);
     request.input('pickup_location', sql.NVarChar, pickup_location);
     request.input('drop_location', sql.NVarChar, drop_location);
+    request.input('cabname', sql.NVarChar, cabname);
     request.input('pickup_date', sql.Date, pickup_date);
     request.input('pickup_time', sql.Time, pickup_time);
     request.input('full_name', sql.NVarChar, full_name);
     request.input('email', sql.NVarChar, email);
     request.input('phone_number', sql.NVarChar, phone_number);
     request.input('country', sql.NVarChar, country);
-    request.input('distance', sql.Float, distance);
     request.input('rent', sql.Int, rent);
     request.input('message', sql.NVarChar, message);
     request.input('status', sql.NVarChar, status);
@@ -134,13 +135,13 @@ cabBookRouter.put('/update/:id', async (req, res) => {
       UPDATE cabbooklist
       SET pickup_location = @pickup_location,
           drop_location = @drop_location,
+          cabname = @cabname,
           pickup_date = @pickup_date,
           pickup_time = @pickup_time,
           full_name = @full_name,
           email = @email,
           phone_number = @phone_number,
           country = @country,
-          distance = @distance,
           rent = @rent,
           message = @message,
           status = @status
@@ -156,13 +157,13 @@ cabBookRouter.put('/update/:id', async (req, res) => {
 });
 
 // DELETE - Delete cab booking by ID
-cabBookRouter.delete('delete/:id', async (req, res) => {
+cabBookRouter.delete('/delete/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
     await dbConnect;
     const request = new sql.Request();
-    request.input('id', sql.Int, id);
+    request.input('id', sql.NVarChar, id);
     const query = 'DELETE FROM cabbooklist WHERE id = @id';
 
     await request.query(query);

@@ -16,6 +16,7 @@ import imagesRouter from './api/imagesApi.js';
 import CabBookingNotificationRouter from './api/appNotificationApi.js';
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import emailRouter from './api/emailSendApi.js';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/tags', tagsRoutes);
 app.use('/api/rent', rentrouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/app', CabBookingNotificationRouter);
+app.use('/api', emailRouter);
 
 // Create an HTTP server
 const server = http.createServer(app);

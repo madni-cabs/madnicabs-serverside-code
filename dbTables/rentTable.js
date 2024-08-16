@@ -1,7 +1,6 @@
-// dbTables/cabListTable.js
 import { sql, dbConnect } from '../database/dbConnect.js';
 
-// Define the Cab model
+// Define the RentTable model
 const createRentTable = async () => {
   await dbConnect; // Ensure database is connected
 
@@ -14,8 +13,8 @@ const createRentTable = async () => {
       id NVARCHAR(255) NOT NULL,
       pickupLocation NVARCHAR(255) NOT NULL,
       dropLocation NVARCHAR(255) NOT NULL,
-      distance INT NOT NULL,
-      rent INT NOT NULL,
+      cabname NVARCHAR(255) NOT NULL,
+      rent INT NOT NULL
     );
   `;
 
