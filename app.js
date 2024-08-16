@@ -59,6 +59,7 @@ wss.on('connection', (ws) => {
 });
 
 export const notifyApp = (bookingDetails) => {
+  console.log('Sending notification to clients:', bookingDetails);
   wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(bookingDetails));

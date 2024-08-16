@@ -49,6 +49,8 @@ cabBookRouter.post('/add', async (req, res) => {
     request.input('status', sql.NVarChar, status);
 
     await request.query(query);
+    // Send the notification after successful booking
+    notifyApp({ title: 'New Booking', body: `${full_name} has booked a cab.` });
 
     res.status(201).json({ message: 'Booking created successfully' });
   } catch (err) {
