@@ -19,6 +19,8 @@ import { WebSocketServer } from 'ws';
 import emailRouter from './api/emailSendApi.js';
 import createEmailValidationsTable from './dbTables/emailValidation.js';
 import emailValidationRouter from './api/emailValidationApi.js';
+import createDashBoardAdminTable from './dbTables/dashboardAdminTable.js';
+import dashboardAdminRouter from './api/dashboardAdminApi.js';
 
 const app = express();
 
@@ -41,10 +43,16 @@ app.use('/api/cabbook', cabBookRoutes);
 app.use('/api/tags', tagsRoutes);
 // Rent Endpoint
 app.use('/api/rent', rentrouter);
+// Images Endpoint
 app.use('/api/images', imagesRouter);
+// Later work on this
 app.use('/api/app', CabBookingNotificationRouter);
+// Email Router Later Work on it
 app.use('/api', emailRouter);
+// Email Validation Router
 app.use('/api', emailValidationRouter);
+// Dashboard Login
+app.use('/api/dashboard', dashboardAdminRouter);
 
 // Create an HTTP server
 const server = http.createServer(app);
@@ -84,7 +92,10 @@ const startServer = async () => {
     await createTagTable();
     // Rent Table
     await createRentTable();
+    // Email Validation Table
     await createEmailValidationsTable();
+    // Dashboard User Table
+    await createDashBoardAdminTable();
 
     const port = process.env.PORT || 80; // Default HTTP port
 
