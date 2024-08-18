@@ -13,7 +13,7 @@ const createRentTable = async () => {
       id NVARCHAR(255) NOT NULL,
       pickupLocation NVARCHAR(255) NOT NULL,
       dropLocation NVARCHAR(255) NOT NULL,
-      cabname NVARCHAR(255) NOT NULL,
+      cab_name NVARCHAR(255) NOT NULL,
       rent INT NOT NULL
     );
   `;

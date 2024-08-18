@@ -17,6 +17,8 @@ import CabBookingNotificationRouter from './api/appNotificationApi.js';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import emailRouter from './api/emailSendApi.js';
+import createEmailValidationsTable from './dbTables/emailValidation.js';
+import emailValidationRouter from './api/emailValidationApi.js';
 
 const app = express();
 
@@ -35,11 +37,14 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // Use your routes
 app.use('/api/cabs', cabListRoutes);
 app.use('/api/cabbook', cabBookRoutes);
+// Tags EndPoint
 app.use('/api/tags', tagsRoutes);
+// Rent Endpoint
 app.use('/api/rent', rentrouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/app', CabBookingNotificationRouter);
 app.use('/api', emailRouter);
+app.use('/api', emailValidationRouter);
 
 // Create an HTTP server
 const server = http.createServer(app);
@@ -75,8 +80,11 @@ const startServer = async () => {
     await dbConnect;
     await createCabTable();
     await createCabBookListTable();
+    // Tag Table
     await createTagTable();
+    // Rent Table
     await createRentTable();
+    await createEmailValidationsTable();
 
     const port = process.env.PORT || 80; // Default HTTP port
 

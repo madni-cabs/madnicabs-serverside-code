@@ -11,18 +11,23 @@ const createCabBookListTable = async () => {
   const createTableQuery = `
     CREATE TABLE cabbooklist (
       id NVARCHAR(255) NOT NULL,
-      pickup_location NVARCHAR(255) NOT NULL,
-      drop_location NVARCHAR(255) NOT NULL,
-      cabname NVARCHAR(255) NOT NULL,
-      pickup_date NVARCHAR(100) NOT NULL,
-      pickup_time NVARCHAR(100) NOT NULL,
-      full_name NVARCHAR(255) NOT NULL,
-      email NVARCHAR(255) NOT NULL,
-      phone_number NVARCHAR(50) NOT NULL,
-      country NVARCHAR(100) NOT NULL,
+      pickup_location NVARCHAR(255),
+      drop_location NVARCHAR(255),
       rent INT,
+      pickup_date NVARCHAR(100),
+      pickup_time NVARCHAR(100),
+      full_name NVARCHAR(255),
+      email NVARCHAR(255),
+      phone_number NVARCHAR(50),
+      country NVARCHAR(100),
       message NVARCHAR(MAX),
-      status NVARCHAR(50) DEFAULT 'Pending'
+      status NVARCHAR(50),
+      cab_name NVARCHAR(255),
+      created_date NVARCHAR(255),
+      created_time NVARCHAR(255),
+      updated_date NVARCHAR(255),
+      updated_time NVARCHAR(255),
+      cancel_reason NVARCHAR(255)
     );
   `;
 

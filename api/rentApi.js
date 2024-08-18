@@ -15,12 +15,12 @@ const generateId = () => {
 
 // Create a fare
 rentRouter.post("/add", async (req, res) => {
-  const { pickupLocation, dropLocation, cabname, rent } = req.body;
+  const { pickupLocation, dropLocation, cab_name, rent } = req.body;
   const id = generateId();
 
   const query = `
-    INSERT INTO renttable (id, pickupLocation, dropLocation, cabname, rent)
-    VALUES (@id, @pickupLocation, @dropLocation, @cabname, @rent)
+    INSERT INTO renttable (id, pickupLocation, dropLocation, cab_name, rent)
+    VALUES (@id, @pickupLocation, @dropLocation, @cab_name, @rent)
   `;
 
   try {
@@ -28,10 +28,10 @@ rentRouter.post("/add", async (req, res) => {
     request.input("id", sql.VarChar, id);
     request.input("pickupLocation", sql.VarChar, pickupLocation);
     request.input("dropLocation", sql.VarChar, dropLocation);
-    request.input("cabname", sql.VarChar, cabname);
+    request.input("cab_name", sql.VarChar, cab_name);
     request.input("rent", sql.Int, rent);
     await request.query(query);
-    res.status(201).json({ id, pickupLocation, dropLocation, cabname, rent });
+    res.status(201).json({ id, pickupLocation, dropLocation, cab_name, rent });
     console.log(res);
   } catch (err) {
     console.error("Error creating fare record:", err);
@@ -76,18 +76,18 @@ rentRouter.get("/get/:id", async (req, res) => {
 // Update a fare by ID
 rentRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { pickupLocation, dropLocation, cabname, rent } = req.body;
+  const { pickupLocation, dropLocation, cab_name, rent } = req.body;
 
   const query = `
     UPDATE renttable
-    SET pickupLocation='${pickupLocation}', dropLocation='${dropLocation}', cabname='${cabname}', rent='${rent}'
+    SET pickupLocation='${pickupLocation}', dropLocation='${dropLocation}', cab_name='${cab_name}', rent='${rent}'
     WHERE id='${id}'
   `;
 
   try {
     const request = new sql.Request();
     await request.query(query);
-    res.status(200).json({ id, pickupLocation, dropLocation, cabname, rent });
+    res.status(200).json({ id, pickupLocation, dropLocation, cab_name, rent });
   } catch (err) {
     res.status(500).json({ error: "Error updating fare record" });
   }
@@ -110,19 +110,19 @@ rentRouter.delete("/delete/:id", async (req, res) => {
   }
 });
 
-// Get distinct drop locations based on pickupLocation and cabname
+// Get distinct drop locations based on pickupLocation and cab_name
 rentRouter.get("/locations/:pickupLocation", async (req, res) => {
   const { pickupLocation } = req.params;
-  const { cabname } = req.query; // Use a query parameter for cabname
+  const { cab_name } = req.query; // Use a query parameter for cab_name
 
   const query = `
-      SELECT DISTINCT dropLocation FROM renttable WHERE pickupLocation=@pickupLocation AND cabname=@cabname
+      SELECT DISTINCT dropLocation FROM renttable WHERE pickupLocation=@pickupLocation AND cab_name=@cab_name
   `;
 
   try {
     const request = new sql.Request();
     request.input("pickupLocation", sql.VarChar, pickupLocation);
-    request.input("cabname", sql.VarChar, cabname);
+    request.input("cab_name", sql.VarChar, cab_name);
     const result = await request.query(query);
     res.status(200).json(result.recordset);
   } catch (err) {
@@ -131,12 +131,12 @@ rentRouter.get("/locations/:pickupLocation", async (req, res) => {
   }
 });
 
-// Get rent and cabname for a specific pickup and drop location
+// Get rent and cab_name for a specific pickup and drop location
 rentRouter.get("/rent-distance", async (req, res) => {
   const { pickup, drop } = req.query;
 
   const query = `
-      SELECT rent, cabname FROM renttable 
+      SELECT rent, cab_name FROM renttable 
       WHERE pickupLocation=@pickup AND dropLocation=@drop
   `;
 
@@ -151,8 +151,8 @@ rentRouter.get("/rent-distance", async (req, res) => {
       res.status(404).json({ error: "No fare found for the selected locations" });
     }
   } catch (err) {
-    console.error("Error retrieving rent and cabname:", err);
-    res.status(500).json({ error: "Error retrieving rent and cabname" });
+    console.error("Error retrieving rent and cab_name:", err);
+    res.status(500).json({ error: "Error retrieving rent and cab_name" });
   }
 });
 

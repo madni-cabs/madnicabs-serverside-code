@@ -7,8 +7,8 @@ const emailRouter = express.Router();
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // or any other email service provider
   auth: {
-    user: 'princesaad1722@gmail.com', // Your email
-    pass: 'xkxx lexe xoya thll', // Your email password (use environment variables for security)
+    user: 'madnicabs@gmail.com', // Your email
+    pass: 'vftt gzxt nkav psmc', // Your email password (use environment variables for security)
   },
   logger: true, // Enable logging
   debug: true,  // Enable debugging
@@ -19,7 +19,7 @@ emailRouter.post('/send-email', async (req, res) => {
   const { to, subject, body } = req.body;
 
   const mailOptions = {
-    from: 'princesaad1722@gmail.com', // Sender address
+    from: 'madnicabs@gmail.com', // Sender address
     to: to, // List of receivers
     subject: subject, // Subject line
     text: body, // Plain text body
