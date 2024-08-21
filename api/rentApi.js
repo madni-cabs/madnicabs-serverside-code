@@ -133,27 +133,29 @@ rentRouter.get("/locations/:pickupLocation", async (req, res) => {
 
 // Get rent and cab_name for a specific pickup and drop location
 rentRouter.get("/rent-distance", async (req, res) => {
-  const { pickup, drop } = req.query;
+  const { pickup, drop, cab_name } = req.query;
 
   const query = `
-      SELECT rent, cab_name FROM renttable 
-      WHERE pickupLocation=@pickup AND dropLocation=@drop
+      SELECT rent FROM renttable 
+      WHERE pickupLocation=@pickup AND dropLocation=@drop AND cab_name=@cab_name
   `;
 
   try {
     const request = new sql.Request();
     request.input("pickup", sql.VarChar, pickup);
     request.input("drop", sql.VarChar, drop);
+    request.input("cab_name", sql.VarChar, cab_name);
     const result = await request.query(query);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset[0]);
     } else {
-      res.status(404).json({ error: "No fare found for the selected locations" });
+      res.status(404).json({ error: "No fare found for the selected locations and cab" });
     }
   } catch (err) {
-    console.error("Error retrieving rent and cab_name:", err);
-    res.status(500).json({ error: "Error retrieving rent and cab_name" });
+    console.error("Error retrieving rent:", err);
+    res.status(500).json({ error: "Error retrieving rent" });
   }
 });
+
 
 export default rentRouter;
