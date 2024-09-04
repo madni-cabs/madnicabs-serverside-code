@@ -2,7 +2,7 @@ import { sql, dbConnect } from '../database/dbConnect.js';
 
 // Define the CabBookList model
 const createCabBookListTable = async () => {
-  await dbConnect; // Ensure database is connected
+  await dbConnect; // Ensure the database is connected
 
   const checkTableQuery = `
     SELECT * FROM sysobjects WHERE name='cabbooklist' and xtype='U';
@@ -10,7 +10,7 @@ const createCabBookListTable = async () => {
 
   const createTableQuery = `
     CREATE TABLE cabbooklist (
-      id NVARCHAR(255) NOT NULL,
+      id NVARCHAR(255) NOT NULL PRIMARY KEY,
       pickup_location NVARCHAR(255),
       drop_location NVARCHAR(255),
       rent INT,
@@ -27,7 +27,8 @@ const createCabBookListTable = async () => {
       created_time NVARCHAR(255),
       updated_date NVARCHAR(255),
       updated_time NVARCHAR(255),
-      cancel_reason NVARCHAR(255)
+      cancel_reason NVARCHAR(255),
+      cancelled_by NVARCHAR(50)
     );
   `;
 

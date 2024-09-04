@@ -16,7 +16,6 @@ import imagesRouter from './api/imagesApi.js';
 import CabBookingNotificationRouter from './api/appNotificationApi.js';
 import http from 'http';
 import { WebSocketServer } from 'ws';
-import emailRouter from './api/emailSendApi.js';
 import createEmailValidationsTable from './dbTables/emailValidation.js';
 import emailValidationRouter from './api/emailValidationApi.js';
 import createDashBoardAdminTable from './dbTables/dashboardAdminTable.js';
@@ -38,6 +37,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Use your routes
 app.use('/api/cabs', cabListRoutes);
+// CabBooking 
 app.use('/api/cabbook', cabBookRoutes);
 // Tags EndPoint
 app.use('/api/tags', tagsRoutes);
@@ -47,8 +47,6 @@ app.use('/api/rent', rentrouter);
 app.use('/api/images', imagesRouter);
 // Later work on this
 app.use('/api/app', CabBookingNotificationRouter);
-// Email Router Later Work on it
-app.use('/api', emailRouter);
 // Email Validation Router
 app.use('/api', emailValidationRouter);
 // Dashboard Login
