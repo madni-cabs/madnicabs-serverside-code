@@ -11,6 +11,8 @@ import {
   adminCancelledBookingUserEmail,
   adminCancelledBookingAdminEmail,
   bookingDeletionTemplateAdmin,
+  bookingMissedTemplateUser,
+  bookingMissedTemplateAdmin,
 } from '../utils/emailTemplates/emailTemplates.js';
 import {
   sendWhatsAppMessageSingle,
@@ -105,8 +107,6 @@ cabBookRouter.post('/add', async (req, res) => {
     const adminHtml = bookingCreationTemplateAdmin(
       id,
       full_name,
-      email,
-      phone_number,
       pickup_location,
       drop_location,
       pickup_date,
@@ -120,7 +120,7 @@ cabBookRouter.post('/add', async (req, res) => {
     // Send email to customer and admin
     await sendEmail(email, 'Your Madni Cabs Booking Confirmation', customerHtml);
     await sendEmail('madnicabs@gmail.com', 'New Booking Notification', adminHtml);
-
+    const action = 'create';
     // Send WhatsApp messages
     const ownerMessage = adminMainOwnerWhatsAppTemplate(
       full_name,
@@ -131,34 +131,67 @@ cabBookRouter.post('/add', async (req, res) => {
       pickup_time,
       cab_name,
       rent,
-      status,
-      'create'
+      email,
+      phone_number,
+      action
     );
 
     const groupMessage = groupWhatsAppTemplate(
-      id,
       full_name,
+      id,
       pickup_location,
       drop_location,
       pickup_date,
       pickup_time,
       cab_name,
-      'create',
-      status
+      rent,
+      email,
+      phone_number,
+      action
     );
 
     try {
       await sendWhatsAppMessageSingle('923095860148', ownerMessage);
-      await sendWhatsAppMessageSingle('923197279911', ownerMessage);
-      await sendWhatsAppGroupMessage('Testing', groupMessage);
+      // await sendWhatsAppMessageSingle('966582480985', ownerMessage);
+      await sendWhatsAppGroupMessage('Madni Cabs', groupMessage);
     } catch (error) {
       await handleWhatsAppError(error, { action: 'create', bookingId: id, fullName: full_name });
     }
 
-    // Return the generated booking ID directly
     res.status(201).json({ message: 'Booking created successfully', id });
   } catch (err) {
     res.status(500).json({ message: 'Error creating booking', details: err.message });
+  }
+});
+
+// GET - Get all cab bookings
+cabBookRouter.get('/get', async (req, res) => {
+  try {
+    await dbConnect;
+    const request = new sql.Request();
+    const query = 'SELECT * FROM cabbooklist';
+    const result = await request.query(query);
+    res.status(200).json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching bookings', details: err.message });
+  }
+});
+
+// GET - Get cab booking by ID
+cabBookRouter.get('/get/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await dbConnect;
+    const request = new sql.Request();
+    request.input('id', sql.NVarChar, id);
+    const query = 'SELECT * FROM cabbooklist WHERE id = @id';
+    const result = await request.query(query);
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    res.status(200).json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching booking', details: err.message });
   }
 });
 
@@ -231,7 +264,7 @@ cabBookRouter.put('/update/:id', async (req, res) => {
     // Send email to customer and admin
     await sendEmail(email, 'Your Madni Cabs Booking Update', customerHtml);
     await sendEmail('madnicabs@gmail.com', 'Madni Cabs Booking Update Notification', adminHtml);
-
+const action = 'update';
     // Send WhatsApp messages
     const ownerMessage = adminMainOwnerWhatsAppTemplate(
       full_name,
@@ -242,26 +275,29 @@ cabBookRouter.put('/update/:id', async (req, res) => {
       pickup_time,
       cab_name,
       rent,
-      status,
-      'update'
+      email,
+      phone_number,
+      action
     );
 
     const groupMessage = groupWhatsAppTemplate(
-      id,
       full_name,
+      id,
       pickup_location,
       drop_location,
       pickup_date,
       pickup_time,
       cab_name,
-      'update',
-      status
+      rent,
+      email,
+      phone_number,
+      action
     );
 
     try {
       await sendWhatsAppMessageSingle('923095860148', ownerMessage);
-      await sendWhatsAppMessageSingle('923197279911', ownerMessage);
-      await sendWhatsAppGroupMessage('Testing', groupMessage);
+      // await sendWhatsAppMessageSingle('966582480985', ownerMessage);
+      await sendWhatsAppGroupMessage('Madni Cabs', groupMessage);
     } catch (error) {
       await handleWhatsAppError(error, { action: 'update', bookingId: id, fullName: full_name });
     }
@@ -337,7 +373,7 @@ cabBookRouter.put('/cancel-by-user/:id', async (req, res) => {
 
     await sendEmail(bookingData.email, 'Madni Cabs Booking Cancellation Confirmation', userEmailContent);
     await sendEmail('madnicabs@gmail.com', 'User Cancelled Booking Notification', adminEmailContent);
-
+    const action = 'cancel';
     // Send WhatsApp messages
     const ownerMessage = adminMainOwnerWhatsAppTemplate(
       bookingData.full_name,
@@ -348,27 +384,33 @@ cabBookRouter.put('/cancel-by-user/:id', async (req, res) => {
       bookingData.pickup_time,
       bookingData.cab_name,
       bookingData.rent,
-      'Cancelled',
-      'cancel',
+      bookingData.email,
+      bookingData.phone_number,
+      'User',
+      action,
       cancel_reason
     );
 
     const groupMessage = groupWhatsAppTemplate(
-      id,
       bookingData.full_name,
+      id,
       bookingData.pickup_location,
       bookingData.drop_location,
       bookingData.pickup_date,
       bookingData.pickup_time,
       bookingData.cab_name,
-      'cancel',
-      'Cancelled'
+      bookingData.rent,
+      bookingData.email,
+      bookingData.phone_number,
+      action,
+      'User',
+      cancel_reason
     );
 
     try {
       await sendWhatsAppMessageSingle('923095860148', ownerMessage);
-      await sendWhatsAppMessageSingle('923197279911', ownerMessage);
-      await sendWhatsAppGroupMessage('Testing', groupMessage);
+      // await sendWhatsAppMessageSingle('966582480985', ownerMessage);
+      await sendWhatsAppGroupMessage('Madni Cabs', groupMessage);
     } catch (error) {
       await handleWhatsAppError(error, { action: 'cancel by user', bookingId: id, fullName: bookingData.full_name });
     }
@@ -455,27 +497,33 @@ cabBookRouter.put('/cancel-by-admin/:id', async (req, res) => {
       bookingData.pickup_time,
       bookingData.cab_name,
       bookingData.rent,
-      'Cancelled',
+      bookingData.email,
+      bookingData.phone_number,
+      'Admin',
       'cancel',
       cancel_reason
     );
 
     const groupMessage = groupWhatsAppTemplate(
-      id,
       bookingData.full_name,
+      id,
       bookingData.pickup_location,
       bookingData.drop_location,
       bookingData.pickup_date,
       bookingData.pickup_time,
       bookingData.cab_name,
+      bookingData.rent,
+      bookingData.email,
+      bookingData.phone_number,
       'cancel',
-      'Cancelled'
+      'Admin',
+      cancel_reason
     );
 
     try {
       await sendWhatsAppMessageSingle('923095860148', ownerMessage);
-      await sendWhatsAppMessageSingle('923197279911', ownerMessage);
-      await sendWhatsAppGroupMessage('Testing', groupMessage);
+      // await sendWhatsAppMessageSingle('966582480985', ownerMessage);
+      await sendWhatsAppGroupMessage('Madni Cabs', groupMessage);
     } catch (error) {
       await handleWhatsAppError(error, { action: 'cancel by admin', bookingId: id, fullName: bookingData.full_name });
     }
@@ -483,6 +531,107 @@ cabBookRouter.put('/cancel-by-admin/:id', async (req, res) => {
     res.status(200).json({ message: 'Booking canceled successfully by the admin.' });
   } catch (err) {
     res.status(500).json({ message: 'Error canceling booking by admin', details: err.message });
+  }
+});
+
+// PUT - Mark booking as "Under Review" (Send email only to admin)
+cabBookRouter.put('/under-review/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await dbConnect;
+    const request = new sql.Request();
+
+    // Fetch the original booking details
+    const fetchQuery = 'SELECT * FROM cabbooklist WHERE id = @id';
+    request.input('id', sql.NVarChar, id);
+    const fetchResult = await request.query(fetchQuery);
+
+    if (fetchResult.recordset.length === 0) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const bookingData = fetchResult.recordset[0];
+
+    // Update the booking to "Under Review" status
+    request.input('status', sql.NVarChar, 'Under Review');
+
+    const query = `
+      UPDATE cabbooklist
+      SET status = @status
+      WHERE id = @id
+    `;
+    await request.query(query);
+
+    res.status(200).json({ message: 'Booking marked as under review successfully.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error marking booking as under review', details: err.message });
+  }
+});
+
+// PUT - Mark booking as missed (Send email to admin and user)
+cabBookRouter.put('/missed/:id', async (req, res) => {
+  const { id } = req.params;
+  const { updated_date, updated_time } = req.body;
+
+  try {
+    await dbConnect;
+    const request = new sql.Request();
+
+    // Fetch the original booking details
+    const fetchQuery = 'SELECT * FROM cabbooklist WHERE id = @id';
+    request.input('id', sql.NVarChar, id);
+    const fetchResult = await request.query(fetchQuery);
+
+    if (fetchResult.recordset.length === 0) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const bookingData = fetchResult.recordset[0];
+
+    // Update the booking to "Missed" status
+    request.input('status', sql.NVarChar, 'Missed');
+    request.input('updated_date', sql.NVarChar, updated_date);
+    request.input('updated_time', sql.NVarChar, updated_time);
+
+    const query = `
+      UPDATE cabbooklist
+      SET status = @status,
+          updated_date = @updated_date,
+          updated_time = @updated_time
+      WHERE id = @id
+    `;
+    await request.query(query);
+
+    // Prepare email content for admin
+    const adminHtml = bookingMissedTemplateAdmin(
+      id,
+      bookingData.full_name,
+      bookingData.pickup_location,
+      bookingData.drop_location,
+      bookingData.pickup_date,
+      bookingData.pickup_time,
+      bookingData.cab_name
+    );
+
+    // Prepare email content for user
+    const userHtml = bookingMissedTemplateUser(
+      bookingData.full_name,
+      id,
+      bookingData.pickup_location,
+      bookingData.drop_location,
+      bookingData.pickup_date,
+      bookingData.pickup_time,
+      bookingData.cab_name
+    );
+
+    // Send emails to admin and user
+    await sendEmail('madnicabs@gmail.com', 'Booking Marked as Missed', adminHtml);
+    await sendEmail(bookingData.email, 'Your Booking Marked as Missed', userHtml);
+
+    res.status(200).json({ message: 'Booking marked as missed successfully.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error marking booking as missed', details: err.message });
   }
 });
 

@@ -253,6 +253,71 @@ const bookingDeletionTemplateAdmin = (
 `;
 
 
+// Template for Booking Marked as Under Review (Admin Notification)
+const bookingUnderReviewTemplateAdmin = (id, fullName, pickupLocation, dropLocation, pickupDate, pickupTime, cabName) => `
+  ${headerTemplate}
+  <div style="padding: 20px; background-color: #ffffff; border-radius: 0 0 8px 8px;">
+    <p style="font-size: 16px; color: #333;">The following booking has been marked as <strong>Under Review</strong>:</p>
+    <ul style="list-style: none; padding: 0; color: #333; margin: 15px 0;">
+      <li><strong>Booking ID:</strong> ${id}</li>
+      <li><strong>Customer Name:</strong> ${fullName}</li>
+      <li><strong>Pickup Location:</strong> ${pickupLocation}</li>
+      <li><strong>Drop Location:</strong> ${dropLocation}</li>
+      <li><strong>Pickup Date:</strong> ${pickupDate}</li>
+      <li><strong>Pickup Time:</strong> ${formatTimeToAmPm(pickupTime)}</li>
+      <li><strong>Cab Name:</strong> ${cabName}</li>
+    </ul>
+    <p style="font-size: 14px; color: #777; text-align: center; margin-top: 20px;">
+      Please review this booking and take necessary actions to resolve the status.
+    </p>
+  </div>
+`;
+
+// Template for Booking Marked as Missed (Admin Notification)
+const bookingMissedTemplateAdmin = (id, fullName, pickupLocation, dropLocation, pickupDate, pickupTime, cabName) => `
+  ${headerTemplate}
+  <div style="padding: 20px; background-color: #ffffff; border-radius: 0 0 8px 8px;">
+    <p style="font-size: 16px; color: #333;">The following booking has been marked as <strong>Missed</strong>:</p>
+    <ul style="list-style: none; padding: 0; color: #333; margin: 15px 0;">
+      <li><strong>Booking ID:</strong> ${id}</li>
+      <li><strong>Customer Name:</strong> ${fullName}</li>
+      <li><strong>Pickup Location:</strong> ${pickupLocation}</li>
+      <li><strong>Drop Location:</strong> ${dropLocation}</li>
+      <li><strong>Pickup Date:</strong> ${pickupDate}</li>
+      <li><strong>Pickup Time:</strong> ${formatTimeToAmPm(pickupTime)}</li>
+      <li><strong>Cab Name:</strong> ${cabName}</li>
+    </ul>
+    <p style="font-size: 14px; color: #777; text-align: center; margin-top: 20px;">
+      Please document this booking status appropriately and ensure all relevant parties are notified.
+    </p>
+  </div>
+`;
+
+// Booking Missed Template for User (User Notification)
+const bookingMissedTemplateUser = (fullName, id, pickupLocation, dropLocation, pickupDate, pickupTime, cabName) => `
+  ${headerTemplate}
+  <div style="padding: 20px; background-color: #ffffff; border-radius: 0 0 8px 8px;">
+    <p style="font-size: 16px; color: #333;">Dear ${fullName},</p>
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      We regret to inform you that your booking was marked as <strong>Missed</strong>. Below are the details of your booking:
+    </p>
+    <ul style="list-style: none; padding: 0; color: #333; margin: 15px 0;">
+      <li><strong>Booking ID:</strong> ${id}</li>
+      <li><strong>Pickup Location:</strong> ${pickupLocation}</li>
+      <li><strong>Drop Location:</strong> ${dropLocation}</li>
+      <li><strong>Pickup Date:</strong> ${pickupDate}</li>
+      <li><strong>Pickup Time:</strong> ${formatTimeToAmPm(pickupTime)}</li>
+      <li><strong>Cab Name:</strong> ${cabName}</li>
+    </ul>
+    <p style="font-size: 14px; color: #777; text-align: center; margin-top: 20px;">
+      We apologize for any inconvenience caused. If you have any questions or need further assistance, please contact our support team.
+    </p>
+  </div>
+  ${footerTemplate}
+`;
+
+
+
 // Elegant OTP Email Template with Username
 const ValidationEmailTemplate = (userName, otpCode) => `
   ${headerTemplate}
@@ -276,4 +341,4 @@ const ValidationEmailTemplate = (userName, otpCode) => `
 `;
 
 
-export { bookingCreationTemplateUser, bookingCreationTemplateAdmin, bookingUpdateTemplateUser, bookingUpdateTemplateAdmin, userCancelledBookingUserEmail, userCancelledBookingAdminEmail, adminCancelledBookingUserEmail, adminCancelledBookingAdminEmail, bookingDeletionTemplateAdmin, ValidationEmailTemplate };
+export { bookingCreationTemplateUser, bookingCreationTemplateAdmin, bookingUpdateTemplateUser, bookingUpdateTemplateAdmin, userCancelledBookingUserEmail, userCancelledBookingAdminEmail, adminCancelledBookingUserEmail, adminCancelledBookingAdminEmail, bookingDeletionTemplateAdmin, ValidationEmailTemplate, bookingUnderReviewTemplateAdmin, bookingMissedTemplateAdmin ,bookingMissedTemplateUser};

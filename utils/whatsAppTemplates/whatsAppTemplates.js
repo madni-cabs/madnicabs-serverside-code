@@ -32,27 +32,44 @@ const sendWhatsAppGroupMessage = async (groupName, message) => {
 };
 
 // Template for Admin Main Owner WhatsApp messages based on action type.
-const adminMainOwnerWhatsAppTemplate = (fullName, id, pickupLocation, dropLocation, pickupDate, pickupTime, cabName, rent, status, action, reason = '') => {
+// Template for Admin Main Owner WhatsApp messages based on action type.
+const adminMainOwnerWhatsAppTemplate = (
+  fullName,
+  id,
+  pickupLocation,
+  dropLocation,
+  pickupDate,
+  pickupTime,
+  cabName,
+  rent,
+  email,
+  phoneNumber,
+  action,
+  cancelledBy = '',
+  reason = ''
+) => {
   let message = '';
 
-  switch (action) {
+  console.log(`Received action for admin template: ${action}`); // Log the received action
+
+  switch (action.trim().toLowerCase()) { // Trim spaces and ensure lowercase for consistency
     case 'create':
       message = `
-Madni Cabs
->> New Booking <<
+             >> New Booking <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
-**Rent:** ${rent} SAR
+Cab Name: ${cabName}
+Rent: ${rent} SAR
 
-**Status:** ${status}
+Email: ${email}
+Phone Number: ${phoneNumber} 
 
 Please review the booking and ensure all arrangements are in place.
       `;
@@ -60,20 +77,20 @@ Please review the booking and ensure all arrangements are in place.
 
     case 'update':
       message = `
-Madni Cabs
->> Booking Updated <<
+             >> Booking Updated <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Updated Pickup Date:** ${pickupDate}
-**Updated Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Updated Pickup Date: ${pickupDate}
+Updated Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
 
-**Status:** ${status}
+Email: ${email}
+Phone Number: ${phoneNumber}
 
 Please review the updates and adjust arrangements as needed.
       `;
@@ -81,20 +98,17 @@ Please review the updates and adjust arrangements as needed.
 
     case 'complete':
       message = `
-Madni Cabs
->> Booking Completed <<
+             >> Booking Completed <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
-
-**Status:** ${status}
+Cab Name: ${cabName}
 
 Thank you for managing this booking successfully!
       `;
@@ -102,30 +116,32 @@ Thank you for managing this booking successfully!
 
     case 'cancel':
       message = `
-Madni Cabs
->> Booking Cancelled <<
+             >> Booking Cancelled <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
+Rent: ${rent} SAR
 
-**Status:** ${status}
-**Cancellation Reason:** ${reason || 'Not provided'}
+Email: ${email}
+Phone Number: ${phoneNumber}
+Cancelled By: ${cancelledBy}
+Cancellation Reason: ${reason || 'Not provided'}
 
 Please ensure all necessary steps are taken regarding this cancellation.
       `;
       break;
 
     default:
+      console.error(`Unknown action type received: ${action}`); // Log the unknown action type for debugging
       message = `
-Madni Cabs
->> Unknown Action <<
+             >> Unknown Action <<
 
 This booking action is not recognized. Please check the booking details and status.
       `;
@@ -134,27 +150,44 @@ This booking action is not recognized. Please check the booking details and stat
   return message;
 };
 
+
 // Template for Group WhatsApp messages based on action type.
-const groupWhatsAppTemplate = (id, fullName, pickupLocation, dropLocation, pickupDate, pickupTime, cabName, action, status) => {
+const groupWhatsAppTemplate = (
+  
+  fullName,
+  id,
+  pickupLocation,
+  dropLocation,
+  pickupDate,
+  pickupTime,
+  cabName,
+  rent,
+  email,
+  phoneNumber,
+  action,
+  cancelledBy,
+  reason,
+) => {
   let message = '';
 
   switch (action) {
     case 'create':
       message = `
-Madni Cabs
->> New Booking <<
+             >> New Booking <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
+Rent: ${rent} SAR
 
-**Status:** ${status}
+Email: ${email}
+Phone Number: ${phoneNumber} 
 
 Ensure readiness for this new booking.
       `;
@@ -162,20 +195,20 @@ Ensure readiness for this new booking.
 
     case 'update':
       message = `
-Madni Cabs
->> Booking Updated <<
+             >> Booking Updated <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Updated Pickup Date:** ${pickupDate}
-**Updated Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Updated Pickup Date: ${pickupDate}
+Updated Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
 
-**Status:** ${status}
+Email: ${email}
+Phone Number: ${phoneNumber}
 
 Adjust schedules accordingly for this updated booking.
       `;
@@ -183,20 +216,18 @@ Adjust schedules accordingly for this updated booking.
 
     case 'complete':
       message = `
-Madni Cabs
->> Booking Completed <<
+             >> Booking Completed <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
 
-**Status:** ${status}
 
 Thank you for completing this booking successfully!
       `;
@@ -204,20 +235,24 @@ Thank you for completing this booking successfully!
 
     case 'cancel':
       message = `
-Madni Cabs
->> Booking Cancelled <<
+             >> Booking Cancelled <<
 
-**Booking ID:** ${id}
-**Customer Name:** ${fullName}
+Booking ID: ${id}
+Customer Name: ${fullName}
 
-**Pickup Location:** ${pickupLocation}
-**Drop Location:** ${dropLocation}
-**Pickup Date:** ${pickupDate}
-**Pickup Time:** ${formatTimeToAmPm(pickupTime)}
+Pickup Location: ${pickupLocation}
+Drop Location: ${dropLocation}
+Pickup Date: ${pickupDate}
+Pickup Time: ${formatTimeToAmPm(pickupTime)}
 
-**Cab Name:** ${cabName}
+Cab Name: ${cabName}
+Rent: ${rent} SAR
 
-**Status:** ${status}
+Email: ${email}
+Phone Number: ${phoneNumber}
+
+Cancelled By: ${cancelledBy}
+Reason: ${reason}
 
 Ensure all necessary actions are taken for this cancellation.
       `;
@@ -225,8 +260,7 @@ Ensure all necessary actions are taken for this cancellation.
 
     default:
       message = `
-Madni Cabs
->> Unknown Action <<
+             >> Unknown Action <<
 
 This booking action is not recognized. Please check the booking details and status.
       `;
@@ -235,4 +269,9 @@ This booking action is not recognized. Please check the booking details and stat
   return message;
 };
 
-export { sendWhatsAppMessageSingle, sendWhatsAppGroupMessage, adminMainOwnerWhatsAppTemplate, groupWhatsAppTemplate };
+export {
+  sendWhatsAppMessageSingle,
+  sendWhatsAppGroupMessage,
+  adminMainOwnerWhatsAppTemplate,
+  groupWhatsAppTemplate,
+};
