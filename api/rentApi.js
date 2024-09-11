@@ -131,19 +131,19 @@ rentRouter.get("/locations/:pickupLocation", async (req, res) => {
   }
 });
 
-// Get rent and cab_name for a specific pickup and drop location
+// Get rent and cab_name for a specific pickupLocation and dropLocation location
 rentRouter.get("/rent-distance", async (req, res) => {
-  const { pickup, drop, cab_name } = req.query;
+  const { pickupLocation, dropLocation, cab_name } = req.query;
 
   const query = `
       SELECT rent FROM renttable 
-      WHERE pickupLocation=@pickup AND dropLocation=@drop AND cab_name=@cab_name
+      WHERE pickupLocation=@pickupLocation AND dropLocation=@dropLocation AND cab_name=@cab_name
   `;
 
   try {
     const request = new sql.Request();
-    request.input("pickup", sql.VarChar, pickup);
-    request.input("drop", sql.VarChar, drop);
+    request.input("pickupLocation", sql.VarChar, pickupLocation);
+    request.input("dropLocation", sql.VarChar, dropLocation);
     request.input("cab_name", sql.VarChar, cab_name);
     const result = await request.query(query);
     if (result.recordset.length > 0) {

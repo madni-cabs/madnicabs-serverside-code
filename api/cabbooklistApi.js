@@ -572,7 +572,6 @@ cabBookRouter.put('/under-review/:id', async (req, res) => {
 // PUT - Mark booking as missed (Send email to admin and user)
 cabBookRouter.put('/missed/:id', async (req, res) => {
   const { id } = req.params;
-  const { updated_date, updated_time } = req.body;
 
   try {
     await dbConnect;
@@ -591,14 +590,10 @@ cabBookRouter.put('/missed/:id', async (req, res) => {
 
     // Update the booking to "Missed" status
     request.input('status', sql.NVarChar, 'Missed');
-    request.input('updated_date', sql.NVarChar, updated_date);
-    request.input('updated_time', sql.NVarChar, updated_time);
 
     const query = `
       UPDATE cabbooklist
       SET status = @status,
-          updated_date = @updated_date,
-          updated_time = @updated_time
       WHERE id = @id
     `;
     await request.query(query);

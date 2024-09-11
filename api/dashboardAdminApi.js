@@ -41,26 +41,27 @@ dashboardAdminRouter.post('/login', async (req, res) => {
 
 // routes/auth.js (continued)
 dashboardAdminRouter.post('/logout', async (req, res) => {
-    await dbConnect;
-  
-    const { token } = req.body;
-  
-    try {
-      const request = new sql.Request();
-      const query = `
-        UPDATE dashboardAdmin SET token = NULL WHERE token = @token;
-      `;
-      request.input('token', sql.NVarChar, token);
-      const result = await request.query(query);
-  
-      if (result.rowsAffected[0] > 0) {
-        res.json({ success: true, message: 'Logged out successfully' });
-      } else {
-        res.status(401).json({ success: false, message: 'Invalid token' });
-      }
-    } catch (err) {
-      res.status(500).json({ success: false, message: 'Server error' });
+  await dbConnect;
+
+  const { token, userId } = req.body; // Accept both token and userId
+
+  try {
+    const request = new sql.Request();
+    const query = `
+      UPDATE dashboardAdmin SET token = NULL WHERE id = @userId AND token = @token;
+    `;
+    request.input('userId', sql.Int, userId);
+    request.input('token', sql.NVarChar, token);
+    const result = await request.query(query);
+
+    if (result.rowsAffected[0] > 0) {
+      res.json({ success: true, message: 'Logged out successfully' });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid token or user ID' });
     }
-  });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 export default dashboardAdminRouter;

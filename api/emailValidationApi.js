@@ -18,39 +18,7 @@ const generateValidationPassword = () => {
 
 // API to generate and send validation password
 emailValidationRouter.post("/email-validation", async (req, res) => {
-  const { fullName,email } = req.body;
-  const validationPassword = generateValidationPassword();
-  const createdAt = new Date().toISOString(); // Store the current date-time as a string
-
-  const query = `
-    INSERT INTO email_validations (id, email, validation_password, created_at)
-    VALUES (@id, @Email, @ValidationPassword, @CreatedAt)
-  `;
-
-  try {
-    const request = new sql.Request();
-    request.input("id", sql.VarChar, Date.now().toString());
-    request.input("Email", sql.VarChar, email);
-    request.input("ValidationPassword", sql.VarChar, validationPassword);
-    request.input("CreatedAt", sql.DateTime, createdAt);
-
-    await request.query(query);
-    console.log("Validation password inserted into database successfully.");
-
-    // Send the validation email using the custom template
-    await sendEmail(email, 'Madni Cabs - Your Email Validation Code', ValidationEmailTemplate(fullName,validationPassword));
-    console.log("Validation email sent successfully.");
-
-    res.status(201).json({ message: "Validation password sent to your email." });
-  } catch (err) {
-    console.error("Error generating validation password:", err);
-    res.status(500).json({ error: "Error generating validation password." });
-  }
-});
-
-// API to generate and send validation password
-emailValidationRouter.post('/email-validation', async (req, res) => {
-  const { email, userName } = req.body; // Ensure userName is provided in the request body
+  const { fullName, email } = req.body; // Ensure fullName is provided in the request body
   const validationPassword = generateValidationPassword();
   const createdAt = new Date().toISOString(); // Store the current date-time as a string
 
@@ -62,23 +30,22 @@ emailValidationRouter.post('/email-validation', async (req, res) => {
   try {
     await dbConnect; // Ensure database is connected
     const request = new sql.Request();
-    request.input('id', sql.VarChar, Date.now().toString());
-    request.input('Email', sql.VarChar, email);
-    request.input('ValidationPassword', sql.VarChar, validationPassword);
-    request.input('CreatedAt', sql.DateTime, createdAt);
+    request.input("id", sql.VarChar, Date.now().toString());
+    request.input("Email", sql.VarChar, email);
+    request.input("ValidationPassword", sql.VarChar, validationPassword);
+    request.input("CreatedAt", sql.DateTime, createdAt);
 
     await request.query(query);
-    console.log('Validation password inserted into database successfully.');
+    console.log("Validation password inserted into database successfully.");
 
     // Send the validation email using the custom template
-    const emailHtml = ValidationEmailTemplate(userName, validationPassword);
-    await sendEmail(email, 'Madni Cabs - Your Email Validation Code', emailHtml);
-    console.log('Validation email sent successfully.');
+    await sendEmail(email, 'Madni Cabs - Your Email Validation Code', ValidationEmailTemplate(fullName, validationPassword));
+    console.log("Validation email sent successfully.");
 
-    res.status(201).json({ message: 'Validation password sent to your email.' });
+    res.status(201).json({ message: "Validation password sent to your email." });
   } catch (err) {
-    console.error('Error generating validation password:', err);
-    res.status(500).json({ error: 'Error generating validation password.' });
+    console.error("Error generating validation password:", err);
+    res.status(500).json({ error: "Error generating validation password." });
   }
 });
 
